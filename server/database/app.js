@@ -58,18 +58,51 @@ app.get('/fetchReviews/dealer/:id', async (req, res) => {
 
 // Express route to fetch all dealerships
 app.get('/fetchDealers', async (req, res) => {
-//Write your code here
+  try {
+    // Fetch all dealers from the database
+    const documents = await Dealerships.find(); // Replace 'Dealer' with your actual model name
+    res.json(documents); // Send the fetched documents as a JSON response
+  } catch (error) {
+    res.status(500).json({ error: 'Error fetching dealers' }); // Handle any errors
+  }
 });
 
 // Express route to fetch Dealers by a particular state
 app.get('/fetchDealers/:state', async (req, res) => {
-//Write your code here
-});
+    try {
+      const documents = await Dealerships.find({ state: req.params.state });
+      res.json(documents);
+    } catch (error) {
+      res.status(500).json({ error: 'Error fetching dealers by state' });
+    }
+  });
 
 // Express route to fetch dealer by a particular id
 app.get('/fetchDealer/:id', async (req, res) => {
-//Write your code here
-});
+    const dealerId = req.params.id;
+  
+    // Check if the ID is a valid integer
+    if (isNaN(dealerId)) {
+      return res.status(400).json({ error: 'Invalid dealership ID format. Must be a number.' });
+    }
+  
+    try {
+      // Fetch the dealership by the provided integer ID
+      const dealership = await Dealerships.findOne({ id: dealerId });
+  
+      // If dealership not found, return a 404 error
+      if (!dealership) {
+        return res.status(404).json({ error: 'Dealership not found' });
+      }
+  
+      // Send the dealership data as a JSON response
+      res.json(dealership);
+    } catch (error) {
+      console.error(error);  // Log the error for debugging
+      res.status(500).json({ error: 'Error fetching dealership' });
+    }
+  });
+  
 
 //Express route to insert review
 app.post('/insert_review', express.raw({ type: '*/*' }), async (req, res) => {
